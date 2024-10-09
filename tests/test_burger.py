@@ -4,6 +4,7 @@ from praktikum.ingredient_types import INGREDIENT_TYPE_FILLING, INGREDIENT_TYPE_
 from praktikum.burger import Burger
 from unittest.mock import Mock
 import pytest
+from typing import List
 
 
 class TestBurger:
@@ -70,9 +71,11 @@ class TestBurger:
         assert burger.get_price() == sum
 
     def test_get_receipt_get_receipt_for_the_bun(self):
+        receipt_new: List[str] = []
         burger = Burger()
         bun_mock = Mock(spec=Bun)
         bun_mock.get_name.return_value = 'Чиабатта по-грузински'
+        receipt_new.append(f'(==== {bun_mock.get_name.return_value} ====)')
         bun_mock.get_price.return_value = 145.99
         ingredient_1_mock = Mock()
         ingredient_2_mock = Mock()
@@ -80,9 +83,13 @@ class TestBurger:
         ingredient_2_mock.get_type.return_value = INGREDIENT_TYPE_SAUCE
         ingredient_1_mock.get_name.return_value = 'Консервированная фасоль'
         ingredient_2_mock.get_name.return_value = 'Сацебели'
+        receipt_new.append(f'= {ingredient_1_mock.get_type.return_value.lower()} {ingredient_1_mock.get_name.return_value} =')
+        receipt_new.append(f'= {ingredient_2_mock.get_type.return_value.lower()} {ingredient_2_mock.get_name.return_value} =')
         ingredient_1_mock.get_price.return_value = 2.50
         ingredient_2_mock.get_price.return_value = 8.99
+        receipt_new.append(f'(==== {bun_mock.get_name.return_value} ====)\n')
+        receipt_new.append(f'Price: 303.47')
         burger.set_buns(bun_mock)
         burger.add_ingredient(ingredient_1_mock)
         burger.add_ingredient(ingredient_2_mock)
-        assert ('Чиабатта по-грузински' in burger.get_receipt() and '303.47' in burger.get_receipt())
+        assert burger.get_receipt() == '\n'.join(receipt_new)
